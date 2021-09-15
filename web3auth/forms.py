@@ -28,7 +28,12 @@ class LoginForm(forms.Form):
 
 
 # list(set()) here is to eliminate the possibility of double including the address field
-signup_fields = list(set(app_settings.WEB3AUTH_USER_SIGNUP_FIELDS + [app_settings.WEB3AUTH_USER_ADDRESS_FIELD]))
+signup_fields = list(
+    set(
+        app_settings.WEB3AUTH_USER_SIGNUP_FIELDS + \
+            [app_settings.WEB3AUTH_USER_ADDRESS_FIELD]
+    )
+)
 
 
 class SignupForm(forms.ModelForm):

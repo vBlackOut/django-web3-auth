@@ -15,28 +15,31 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from django.urls import path, include
+from django.contrib.auth import logout
+
 from django.shortcuts import render, redirect
 from django.views.generic import RedirectView
 
 
 def login(request):
-    if not request.user.is_authenticated:
-        return render(request, 'web3auth/login.html')
-    else:
-        return redirect('/admin/login')
+    return render(request, 'web3auth/login.html')
 
 
 def auto_login(request):
-    if not request.user.is_authenticated:
-        return render(request, 'web3auth/autologin.html')
-    else:
-        return redirect('/admin/login')
+    return render(request, 'web3auth/autologin.html')
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')
+
 
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^$', RedirectView.as_view(url='/login')),
-    url(r'^login/', login, name='login'),
-    url(r'^auto_login/', auto_login, name='autologin'),
-    url(r'', include('web3auth.urls')),
+    path('admin/', admin.site.urls),
+    path('login/', login, name='login'),
+    path('auto_login/', auto_login, name='autologin'),
+    path('', include('web3auth.urls', namespace='web3auth')),
+    path('', RedirectView.as_view(url='/login')),
+    path('logout/', logout_view, name='logout'),
 ]

@@ -10,6 +10,7 @@ from django.urls.exceptions import NoReverseMatch
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
+
 from web3auth.forms import LoginForm, SignupForm
 from web3auth.settings import app_settings
 
@@ -32,9 +33,11 @@ def login_api(request):
     if request.method == 'GET':
         token = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for i in range(32))
         request.session['login_token'] = token
+        breakpoint()
         return JsonResponse({'data': token, 'success': True})
     else:
         token = request.session.get('login_token')
+        breakpoint()
         if not token:
             return JsonResponse({'error': _(
                 "No login token in session, please request token again by sending GET request to this url"),

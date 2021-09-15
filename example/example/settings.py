@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     # they should be added here
 ]
 
-l = [
+MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -51,15 +51,6 @@ l = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-from django import get_version
-from packaging import version
-
-if version.parse(get_version()) < version.parse("1.10"):
-    MIDDLEWARE_CLASSES = l
-    MIDDLEWARE_CLASSES += ['django.contrib.auth.middleware.SessionAuthenticationMiddleware', ]
-else:
-    MIDDLEWARE = l
 
 ROOT_URLCONF = 'example.urls'
 
