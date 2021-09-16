@@ -52,7 +52,9 @@ function loginWithSignature(address, signature, login_url, onLoginRequestError, 
     request.send(formData);
 }
 
-function checkWeb3(callback) {
+async function checkWeb3(callback) {
+    // TODO Use a different ETH gateway provider?
+    const web3 = new Web3("https://cloudflare-eth.com");
     web3.eth.getAccounts(function (err, accounts) { // Check for wallet being locked
         if (err) {
             throw err;
@@ -61,8 +63,22 @@ function checkWeb3(callback) {
     });
 }
 
-function web3Login(login_url, onTokenRequestFail, onTokenSignFail, onTokenSignSuccess, // used in this function
-                   onLoginRequestError, onLoginFail, onLoginSuccess) {
+async function promptLogin(){
+    await window.ethereum.enable();
+}
+
+async function getUserAccount(){
+    const accounts = await window.ethereum.request(
+        {
+            method: 'eth_requestAccounts'
+        }
+    );
+    return accounts[0];
+}
+
+
+
+async function web3Login(login_url) {
     // used in loginWithSignature
 
     // 1. Retrieve arbitrary login token from server
@@ -76,47 +92,38 @@ function web3Login(login_url, onTokenRequestFail, onTokenSignFail, onTokenSignSu
     var request = new XMLHttpRequest();
     request.open('GET', login_url, true);
 
-    request.onload = function () {
+    request.onload = async function () {
         if (request.status >= 200 && request.status < 400) {
             // Success!
             var resp = JSON.parse(request.responseText);
-            var token = resp.data;
+            var token = resp.token;
+            var msg = resp.message;
             console.log("Token: " + token);
-            var msg = web3.toHex(token);
-            var from = web3.eth.accounts[0];
-            web3.personal.sign(msg, from, function (err, result) {
-                if (err) {
-                    if (typeof onTokenSignFail == 'function') {
-                        onTokenSignFail(err);
-                    }
-                    console.log("Failed signing message \n" + msg + "\n - " + err);
-                } else {
-                    console.log("Signed message: " + result);
-                    if (typeof onTokenSignSuccess == 'function') {
-                        onTokenSignSuccess(result);
-                    }
-                    loginWithSignature(from, result, login_url, onLoginRequestError, onLoginFail, onLoginSuccess);
-                }
+            web3 = new Web3();
+            var hex_token = web3.utils.toHex(token);
+            var from = await getUserAccount();
+            var signable_message = msg + hex_token;
+            window.ethereum.request(
+                {
+                    method: 'personal_sign',
+                    params: [
+                        from, hex_token
+                    ]
+            })
+            .then((result) => {
+                loginWithSignature(from, result, login_url);
+            })
+            .catch((error) => {
+                console.log(error);
             });
-
         } else {
             // We reached our target server, but it returned an error
             console.log("Autologin failed - request status " + request.status);
-            if (typeof onTokenRequestFail == 'function') {
-                onTokenRequestFail(request);
-            }
         }
     };
-
     request.onerror = function () {
         // There was a connection error of some sort
         console.log("Autologin failed - there was an error");
-        if (typeof onTokenRequestFail == 'function') {
-            onTokenRequestFail(request);
-        }
     };
     request.send();
 }
-
-
-

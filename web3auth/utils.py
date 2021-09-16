@@ -22,7 +22,9 @@ def hash_personal_message(msg):
 def recover_to_addr(msg, sig):
     msghash = hash_personal_message(msg)
     vrs = sig_to_vrs(sig)
-    return '0x' + sha3.keccak_256(ecrecover_to_pub(msghash, *vrs)).hexdigest()[24:]
+    return '0x' + sha3.keccak_256(
+        ecrecover_to_pub(msghash, *vrs)
+    ).hexdigest()[24:]
 
 
 def validate_eth_address(value):

@@ -9,8 +9,13 @@ from .utils import validate_eth_address
 
 
 class LoginForm(forms.Form):
-    signature = forms.CharField(widget=forms.HiddenInput, max_length=132)
-    address = forms.CharField(widget=forms.HiddenInput, max_length=42, validators=[validate_eth_address])
+    signature = forms.CharField(
+        widget=forms.HiddenInput, max_length=132
+    )
+    address = forms.CharField(
+        widget=forms.HiddenInput, max_length=42,
+        validators=[validate_eth_address]
+    )
 
     def __init__(self, token, *args, **kwargs):
         self.token = token
@@ -37,6 +42,7 @@ signup_fields = list(
 
 
 class SignupForm(forms.ModelForm):
+    ADDRESS_FIELD = app_settings.WEB3AUTH_USER_ADDRESS_FIELD
 
     def __init__(self, *args, **kwargs):
         # first call parent's constructor
@@ -46,11 +52,13 @@ class SignupForm(forms.ModelForm):
         # and if the user loses private key he can get 'reset' password link to email
         if 'email' in app_settings.WEB3AUTH_USER_SIGNUP_FIELDS:
             self.fields['email'].required = True
-        self.fields[app_settings.WEB3AUTH_USER_ADDRESS_FIELD].required = True
+        self.fields[self.ADDRESS_FIELD].required = True
 
     def clean_address_field(self):
-        validate_eth_address(self.cleaned_data[app_settings.WEB3AUTH_USER_ADDRESS_FIELD])
-        return self.cleaned_data[app_settings.WEB3AUTH_USER_ADDRESS_FIELD].lower()
+        validate_eth_address(
+            self.cleaned_data[self.ADDRESS_FIELD]
+        )
+        return self.cleaned_data[self.ADDRESS_FIELD].lower()
 
     class Meta:
         model = get_user_model()
@@ -58,4 +66,8 @@ class SignupForm(forms.ModelForm):
 
 
 # hack to set the method for cleaning address field
-setattr(SignupForm, 'clean_' + app_settings.WEB3AUTH_USER_ADDRESS_FIELD, SignupForm.clean_address_field)
+setattr(
+    SignupForm,
+    'clean_' + app_settings.WEB3AUTH_USER_ADDRESS_FIELD,
+    SignupForm.clean_address_field
+)

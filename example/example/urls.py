@@ -40,6 +40,5 @@ urlpatterns = [
     path('login/', login, name='login'),
     path('auto_login/', auto_login, name='autologin'),
     path('', include('web3auth.urls', namespace='web3auth')),
-    path('', RedirectView.as_view(url='/login')),
     path('logout/', logout_view, name='logout'),
 ]
