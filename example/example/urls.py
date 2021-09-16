@@ -19,26 +19,25 @@ from django.urls import path, include
 from django.contrib.auth import logout
 
 from django.shortcuts import render, redirect
-from django.views.generic import RedirectView
 
 
 def login(request):
     return render(request, 'web3auth/login.html')
 
 
-def auto_login(request):
-    return render(request, 'web3auth/autologin.html')
-
 def logout_view(request):
     logout(request)
     return redirect('login')
 
 
+def user_view(request):
+    return render(request, 'web3auth/user.html')
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', login, name='login'),
-    path('auto_login/', auto_login, name='autologin'),
+    path('user/', user_view, name='user'),
     path('', include('web3auth.urls', namespace='web3auth')),
     path('logout/', logout_view, name='logout'),
 ]

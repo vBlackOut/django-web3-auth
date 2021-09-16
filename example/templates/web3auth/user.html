@@ -1,0 +1,8 @@
+{% extends 'web3auth/base.html' %}
+{% block content %}
+  {% if request.user.is_authenticated %}
+    <h4>Hi there, {{ request.user.username }}</h4>
+  {% else %}
+    <h4> You're not logged in </h4>
+  {% endif %}
+{% endblock content %}

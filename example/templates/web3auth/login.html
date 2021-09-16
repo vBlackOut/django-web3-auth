@@ -4,19 +4,31 @@
     <h4>You're already logged in</h4>
   {% else %}
     <div class="row m-t-2">
-      <button type="button" onclick="startLogin()">Login</button>
+      <button type="button" onclick="connectWallet()">Connect wallet</button>
     </div>
   {% endif %}
 {% endblock content %}
 {% block javascript %}
   {{ block.super }}
   <script>
-    async function startLogin() {
-      await promptLogin();
-      var login_url = "{% url 'web3auth:web3auth_login_api' %}";
-      await web3Login(login_url, console.log, console.log, console.log, console.log, console.log, function (resp) {
+    // Enable autologin from here
+    autologin = false;
+    function ready(fn) {
+      if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        fn();
+      } else {
+        document.addEventListener('DOMContentLoaded', fn);
+      }
+    }
+
+    async function connectWallet() {
+      var authUrl = "{% url 'web3auth:web3auth_api' %}";
+      await authWeb3(authUrl, console.log, console.log, console.log, console.log, console.log, function (resp) {
           window.location.replace(resp.redirect_url);
       });
+    };
+    if (autologin) {
+      ready(connectWallet);
     };
   </script>
 {% endblock javascript %}

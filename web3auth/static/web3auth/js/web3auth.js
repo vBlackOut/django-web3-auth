@@ -14,28 +14,22 @@ function getCookie(name) {
     return cookieValue;
 }
 
-function loginWithSignature(address, signature, login_url, onLoginRequestError, onLoginFail, onLoginSuccess) {
+function loginWithSignature(address, signature, authUrl) {
     var request = new XMLHttpRequest();
-    request.open('POST', login_url, true);
+    request.open('POST', authUrl, true);
     request.onload = function () {
         if (request.status >= 200 && request.status < 400) {
             // Success!
             var resp = JSON.parse(request.responseText);
             if (resp.success) {
-                if (typeof onLoginSuccess == 'function') {
-                    onLoginSuccess(resp);
-                }
+                var redirectUrl = resp.redirect_url;
+                window.location.replace(redirectUrl);
             } else {
-                if (typeof onLoginFail == 'function') {
-                    onLoginFail(resp);
-                }
+                console.log(resp)
             }
         } else {
             // We reached our target server, but it returned an error
-            console.log("Autologin failed - request status " + request.status);
-            if (typeof onLoginRequestError == 'function') {
-                onLoginRequestError(request);
-            }
+            console.log(resp)
         }
     };
 
@@ -52,20 +46,6 @@ function loginWithSignature(address, signature, login_url, onLoginRequestError, 
     request.send(formData);
 }
 
-async function checkWeb3(callback) {
-    // TODO Use a different ETH gateway provider?
-    const web3 = new Web3("https://cloudflare-eth.com");
-    web3.eth.getAccounts(function (err, accounts) { // Check for wallet being locked
-        if (err) {
-            throw err;
-        }
-        callback(accounts.length !== 0);
-    });
-}
-
-async function promptLogin(){
-    await window.ethereum.enable();
-}
 
 async function getUserAccount(){
     const accounts = await window.ethereum.request(
@@ -76,9 +56,7 @@ async function getUserAccount(){
     return accounts[0];
 }
 
-
-
-async function web3Login(login_url) {
+async function authWeb3(authUrl) {
     // used in loginWithSignature
 
     // 1. Retrieve arbitrary login token from server
@@ -90,19 +68,16 @@ async function web3Login(login_url) {
 
 
     var request = new XMLHttpRequest();
-    request.open('GET', login_url, true);
+    request.open('GET', authUrl, true);
 
     request.onload = async function () {
         if (request.status >= 200 && request.status < 400) {
             // Success!
             var resp = JSON.parse(request.responseText);
             var token = resp.token;
-            var msg = resp.message;
-            console.log("Token: " + token);
             web3 = new Web3();
             var hex_token = web3.utils.toHex(token);
             var from = await getUserAccount();
-            var signable_message = msg + hex_token;
             window.ethereum.request(
                 {
                     method: 'personal_sign',
@@ -111,7 +86,7 @@ async function web3Login(login_url) {
                     ]
             })
             .then((result) => {
-                loginWithSignature(from, result, login_url);
+                loginWithSignature(from, result, authUrl);
             })
             .catch((error) => {
                 console.log(error);
