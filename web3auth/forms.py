@@ -4,12 +4,13 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.utils.translation import ugettext_lazy as _
 
+from .fields import EthAddressFormField
 from .utils import validate_eth_address, recover_to_addr
 
 
 class AuthForm(forms.Form):
     signature = forms.CharField(max_length=132)
-    address = forms.CharField(max_length=42, validators=[validate_eth_address])
+    address = EthAddressFormField()
 
     def __init__(self, token, *args, **kwargs):
         self.token = token
