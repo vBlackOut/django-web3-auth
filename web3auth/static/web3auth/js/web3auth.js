@@ -102,3 +102,9 @@ async function authWeb3(authUrl) {
     };
     request.send();
 }
+
+$("body").bind("ajaxSend", function(elm, xhr, s){
+    if (s.type == "POST") {
+       xhr.setRequestHeader('X-CSRF-Token', getCookie('csrftoken'));
+    }
+ });
