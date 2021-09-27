@@ -2,7 +2,7 @@ from py_ecc.secp256k1.secp256k1 import add
 import sha3
 
 from ethereum.utils import ecrecover_to_pub
-from eth_utils import is_hex_address
+from eth_utils import is_hex_address, is_hex
 
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
@@ -33,5 +33,19 @@ def validate_eth_address(value):
     if not is_hex_address(value):
         raise ValidationError(
             _('%(value)s is not a valid Ethereum address'),
+            params={'value': value},
+        )
+
+
+def validate_eth_transaction(value):
+    if not all(
+        [
+            isinstance(value, str),
+            is_hex(value),
+            len(value) == 64
+        ]
+    ):
+        raise ValidationError(
+            _('%(value)s is not a valid Ethereum transaction id'),
             params={'value': value},
         )
