@@ -42,7 +42,6 @@ def validate_eth_transaction(value):
         [
             isinstance(value, str),
             is_hex(value),
-            len(value) == 64
         ]
     ):
         raise ValidationError(

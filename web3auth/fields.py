@@ -27,7 +27,7 @@ class EthAddressFormField(forms.CharField):
 class EthTransactionField(models.CharField):
     def __init__(self, *args, **kwargs):
         if 'max_length' not in kwargs:
-            kwargs['max_length'] = 64
+            kwargs['max_length'] = 66
         if 'db_index' not in kwargs:
             kwargs['db_index'] = True
         super().__init__(*args, **kwargs)
@@ -38,6 +38,6 @@ class EthTransactionFormField(forms.CharField):
 
     def __init__(self, *args, **kwargs):
         if 'max_length' not in kwargs:
-            kwargs['max_length'] = 64
+            kwargs['max_length'] = 66
         super().__init__(*args, **kwargs)
         self.validators.append(validate_eth_transaction)
