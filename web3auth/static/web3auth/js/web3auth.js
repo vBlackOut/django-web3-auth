@@ -23,7 +23,7 @@ function loginWithSignature(address, signature, authUrl) {
             var resp = JSON.parse(request.responseText);
             if (resp.success) {
                 var redirectUrl = resp.redirect_url;
-                window.location.replace(redirectUrl);
+                return redirectUrl;
             } else {
                 console.log(resp)
             }
@@ -86,7 +86,7 @@ async function authWeb3(authUrl) {
                     ]
             })
             .then((result) => {
-                loginWithSignature(from, result, authUrl);
+                return loginWithSignature(from, result, authUrl);
             })
             .catch((error) => {
                 console.log(error);
