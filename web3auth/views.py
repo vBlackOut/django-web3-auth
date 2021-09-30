@@ -13,17 +13,7 @@ from django.utils.translation import ugettext_lazy as _
 from web3auth.forms import AuthForm
 
 
-def get_redirect_url(request):
-    if request.GET.get('next'):
-        return request.GET.get('next')
-    elif request.POST.get('next'):
-        return request.POST.get('next')
-    elif settings.LOGIN_REDIRECT_URL:
-        try:
-            url = reverse(settings.LOGIN_REDIRECT_URL)
-        except NoReverseMatch:
-            url = settings.LOGIN_REDIRECT_URL
-        return url
+
 
 
 class Web3AuthAPIView(View):
@@ -80,7 +70,7 @@ class Web3AuthAPIView(View):
                 return JsonResponse(
                     {
                         'success': True,
-                        'redirect_url': get_redirect_url(request)
+                        'redirect_url': self.get_redirect_url(request)
                     }
                 )
             else:
@@ -90,3 +80,17 @@ class Web3AuthAPIView(View):
                         'error': json.loads(form.errors.as_json())
                     }
                 )
+
+    def get_redirect_url(self, request):
+        if request.GET.get('next'):
+            return request.GET.get('next')
+        elif request.POST.get('next'):
+            return request.POST.get('next')
+        elif (referer := request.META.get('HTTP_REFERER')):
+            return referer
+        elif settings.LOGIN_REDIRECT_URL:
+            try:
+                url = reverse(settings.LOGIN_REDIRECT_URL)
+            except NoReverseMatch:
+                url = settings.LOGIN_REDIRECT_URL
+            return url

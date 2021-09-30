@@ -14,7 +14,7 @@ function getCookie(name) {
     return cookieValue;
 }
 
-function loginWithSignature(address, signature, authUrl) {
+function loginWithSignature(address, signature, authUrl, redirect) {
     var request = new XMLHttpRequest();
     request.open('POST', authUrl, true);
     request.onload = function () {
@@ -22,8 +22,10 @@ function loginWithSignature(address, signature, authUrl) {
             // Success!
             var resp = JSON.parse(request.responseText);
             if (resp.success) {
-                var redirectUrl = resp.redirect_url;
-                return redirectUrl;
+                if (redirect) {
+                    var redirectUrl = resp.redirect_url;
+                    window.location.replace(redirectUrl);
+                }
             } else {
                 console.log(resp)
             }
@@ -56,7 +58,7 @@ async function getUserAccount(){
     return accounts[0];
 }
 
-async function authWeb3(authUrl) {
+async function authWeb3(authUrl, redirect = true) {
     // used in loginWithSignature
 
     // 1. Retrieve arbitrary login token from server
@@ -86,7 +88,7 @@ async function authWeb3(authUrl) {
                     ]
             })
             .then((result) => {
-                return loginWithSignature(from, result, authUrl);
+                loginWithSignature(from, result, authUrl, redirect);
             })
             .catch((error) => {
                 console.log(error);
