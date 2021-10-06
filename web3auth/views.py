@@ -13,9 +13,6 @@ from django.utils.translation import ugettext_lazy as _
 from web3auth.forms import AuthForm
 
 
-
-
-
 class Web3AuthAPIView(View):
     http_method_names = ['get', 'post']
     MESSAGE = _(

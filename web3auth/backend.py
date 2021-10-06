@@ -8,6 +8,8 @@ from web3auth.utils import recover_to_addr
 
 User = get_user_model()
 
+DEFAULT_ADDRESS_FIELD = 'username'
+
 
 class Web3Backend(backends.ModelBackend):
 
@@ -24,7 +26,7 @@ class Web3Backend(backends.ModelBackend):
         else:
             # get address field for the user model
             address_field = getattr(
-                settings, 'WEB3AUTH_USER_ADDRESS_FIELD', 'username')
+                settings, 'WEB3AUTH_USER_ADDRESS_FIELD', DEFAULT_ADDRESS_FIELD)
             kwargs = {
                 f"{address_field}__iexact": address
             }
@@ -32,5 +34,12 @@ class Web3Backend(backends.ModelBackend):
             user = User.objects.filter(**kwargs).first()
             if user is None:
                 # create the user if it does not exist
-                user = User.objects.create(**{address_field: address})
+                user = User(**{address_field: address})
+                fields = [field.name for field in User._meta.fields]
+                if (
+                        address_field != DEFAULT_ADDRESS_FIELD
+                        and 'username' in fields
+                ):
+                    user.username = user.generate_username()
+                user.save()
             return user
