@@ -9,26 +9,14 @@
   {% endif %}
 {% endblock content %}
 {% block javascript %}
+  <script type='text/javascript'>
+    window.AUTH_ENDPOINT = "{% url 'web3auth:web3auth_api' %}";
+  </script>
   {{ block.super }}
-  <script>
-    // Enable autologin from here
-    autologin = false;
-    function ready(fn) {
-      if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
-        fn();
-      } else {
-        document.addEventListener('DOMContentLoaded', fn);
-      }
-    }
-
-    async function connectWallet() {
-      var authUrl = "{% url 'web3auth:web3auth_api' %}";
-      await authWeb3(authUrl, console.log, console.log, console.log, console.log, console.log, function (resp) {
-          window.location.replace(resp.redirect_url);
-      });
-    };
-    if (autologin) {
-      ready(connectWallet);
-    };
+  <script type='module'>
+    import {
+      connectWallet
+    } from '../static/web3auth/js/web3auth.js'
+    window.connectWallet = connectWallet
   </script>
 {% endblock javascript %}

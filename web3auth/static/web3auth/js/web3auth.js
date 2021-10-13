@@ -1,4 +1,4 @@
-function getCookie(name) {
+export function getCookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie != '') {
         var cookies = document.cookie.split(';');
@@ -49,7 +49,7 @@ function loginWithSignature(address, signature, authUrl, redirect) {
 }
 
 
-async function getUserAccount(){
+export async function getUserAccount(){
     const accounts = await window.ethereum.request(
         {
             method: 'eth_requestAccounts'
@@ -58,7 +58,19 @@ async function getUserAccount(){
     return accounts[0];
 }
 
-async function authWeb3(authUrl, redirect = true) {
+function asciiToHex (str) {
+    if(!str)
+        return "0x00";
+    var hex = "";
+    for(var i = 0; i < str.length; i++) {
+        var code = str.charCodeAt(i);
+        var n = code.toString(16);
+        hex += n.length < 2 ? '0' + n : n;
+    }
+    return "0x" + hex;
+};
+
+export async function authWeb3(authUrl, redirect = true) {
     // used in loginWithSignature
 
     // 1. Retrieve arbitrary login token from server
@@ -77,8 +89,7 @@ async function authWeb3(authUrl, redirect = true) {
             // Success!
             var resp = JSON.parse(request.responseText);
             var token = resp.token;
-            web3 = new Web3();
-            var hex_token = web3.utils.toHex(token);
+            var hex_token = asciiToHex(token);
             var from = await getUserAccount();
             window.ethereum.request(
                 {
@@ -105,8 +116,6 @@ async function authWeb3(authUrl, redirect = true) {
     request.send();
 }
 
-$("body").bind("ajaxSend", function(elm, xhr, s){
-    if (s.type == "POST") {
-       xhr.setRequestHeader('X-CSRF-Token', getCookie('csrftoken'));
-    }
- });
+export async function connectWallet (redirect = true) {
+    await authWeb3(window.AUTH_ENDPOINT, redirect)
+};
