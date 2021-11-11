@@ -12,6 +12,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from web3auth.forms import AuthForm
 
+User = get_user_model()
+
 
 class Web3AuthAPIView(View):
     http_method_names = ['get', 'post']
@@ -91,3 +93,14 @@ class Web3AuthAPIView(View):
             except NoReverseMatch:
                 url = settings.LOGIN_REDIRECT_URL
             return url
+
+
+class MockLoginView(Web3AuthAPIView):
+    """
+    A view that automatically logs in the first user, for test purposes
+    """
+
+    def get(self, request):
+        user = User.objects.first()
+        login(request, user, 'web3auth.backend.Web3Backend')
+        return redirect(self.get_redirect_url(request))
