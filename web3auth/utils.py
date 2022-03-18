@@ -1,4 +1,3 @@
-from py_ecc.secp256k1.secp256k1 import add
 import sha3
 
 from ethereum.utils import ecrecover_to_pub
