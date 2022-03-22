@@ -6,13 +6,15 @@ from django.conf import settings
 from django.views import View
 from django.contrib.auth import get_user_model, login, authenticate
 from django.http import JsonResponse
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import redirect, reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.translation import ugettext_lazy as _
 
 from web3auth.forms import AuthForm
 
 User = get_user_model()
+
+DEFAULT_AUTH_BACKEND = 'web3auth.backend.Web3Backend'
 
 
 class Web3AuthAPIView(View):
@@ -65,7 +67,12 @@ class Web3AuthAPIView(View):
                             'success': False, 'error': str(exc)
                         }
                     )
-                login(request, user, 'web3auth.backend.Web3Backend')
+                auth_backend = getattr(
+                    settings,
+                    'WEB3AUTH_BACKEND',
+                    DEFAULT_AUTH_BACKEND
+                )
+                login(request, user, auth_backend)
                 return JsonResponse(
                     {
                         'success': True,
