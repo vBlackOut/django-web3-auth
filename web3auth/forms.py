@@ -2,7 +2,10 @@ import string
 
 from django import forms
 from django.contrib.auth import get_user_model
-from django.utils.translation import ugettext_lazy as _
+try:
+    from django.utils.translation import ugettext_lazy as _
+except ImportError:
+    from django.utils.translation import gettext_lazy as _
 
 from .fields import EthAddressFormField
 from .utils import validate_eth_address, recover_to_addr

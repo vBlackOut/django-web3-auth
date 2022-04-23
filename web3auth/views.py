@@ -8,7 +8,10 @@ from django.contrib.auth import get_user_model, login, authenticate
 from django.http import JsonResponse
 from django.shortcuts import redirect, reverse
 from django.urls.exceptions import NoReverseMatch
-from django.utils.translation import ugettext_lazy as _
+try:
+    from django.utils.translation import ugettext_lazy as _
+except ImportError:
+    from django.utils.translation import gettext_lazy as _
 
 from web3auth.forms import AuthForm
 

@@ -4,7 +4,10 @@ from ethereum.utils import ecrecover_to_pub
 from eth_utils import is_hex_address, is_hex
 
 from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext_lazy as _
+try:
+    from django.utils.translation import ugettext_lazy as _
+except ImportError:
+    from django.utils.translation import gettext_lazy as _
 
 
 def sig_to_vrs(sig):
