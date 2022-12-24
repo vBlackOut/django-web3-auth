@@ -17,7 +17,6 @@ def main():
         'packages': find_packages(exclude=['*tests*']),
         'python_requires': '>=3.9',
         'install_requires': [
-            'ethereum==2.3.*',
             'eth_utils==1.10.*',
             'Django>=3.2.*',
         ],
