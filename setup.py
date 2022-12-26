@@ -22,7 +22,7 @@ def main():
             # workaround for python 3.11 with pycryptodome (due to ethereum package switch to web3 package)
             'pycryptodome>=3.15.0',
             'py-ecc>=5.2.0',
-            'rlp>=3.0.0',
+            'rlp>2.0.0',
         ],
         'extras_require': {},
         'include_package_data': True,
