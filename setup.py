@@ -17,9 +17,12 @@ def main():
         'packages': find_packages(exclude=['*tests*']),
         'python_requires': '>=3.9',
         'install_requires': [
-            'ethereum==2.3.*',
-            'eth_utils==1.10.*',
+            'eth_utils>=1.10.*',
             'Django>=3.2.*',
+            # workaround for python 3.11 with pycryptodome (due to ethereum package switch to web3 package)
+            'pycryptodome>=3.15.0',
+            'py-ecc>=5.2.0',
+            'rlp>=3.0.0',
         ],
         'extras_require': {},
         'include_package_data': True,
