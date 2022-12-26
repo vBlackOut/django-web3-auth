@@ -1,4 +1,4 @@
-import sha3
+from Crypto.Hash import keccak
 
 from py_ecc.secp256k1 import ecdsa_raw_recover
 from eth_utils import is_hex_address, is_hex
@@ -88,14 +88,16 @@ def sig_to_vrs(sig):
 
 def hash_personal_message(msg):
     padded = "\x19Ethereum Signed Message:\n" + str(len(msg)) + msg
-    return sha3.keccak_256(bytes(padded, 'utf8')).digest()
+    return keccak.new(data=padded, digest_bits=256).digest()
 
 
 def recover_to_addr(msg, sig):
     msghash = hash_personal_message(msg)
     vrs = sig_to_vrs(sig)
-    address = '0x' + sha3.keccak_256(
-        ecrecover_to_pub(msghash, *vrs)).hexdigest()[24:]
+    address = '0x' + keccak.new(
+        data=ecrecover_to_pub(msghash, *vrs),
+        digest_bits=256,
+    ).hexdigest()[24:]
     return address
 
 
