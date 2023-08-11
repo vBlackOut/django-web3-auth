@@ -19,7 +19,6 @@ def main():
         'install_requires': [
             'ethereum==2.3.*',
             'eth_utils==1.10.*',
-            'Django>=3.2.*',
         ],
         'extras_require': {},
         'include_package_data': True,
